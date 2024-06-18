@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const bcrypt = require('bcryptjs');
 
 const userController = {};
 
@@ -21,7 +22,7 @@ userController.createUser = async (req, res) => {
       contact,
     });
     await newUser.save();
-    res.status(200).json({ status: 'success', error: error.message });
+    return res.status(200).json({ status: 'success' });
   } catch (error) {
     res.status(400).json({ status: 'fail', error: error.message });
   }
