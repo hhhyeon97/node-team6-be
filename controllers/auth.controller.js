@@ -1,10 +1,11 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
-
 const authController = {};
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
+const { OAuth2Client } = require('google-auth-library');
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 
 authController.loginWithEmail = async (req, res) => {
   try {
@@ -21,6 +22,42 @@ authController.loginWithEmail = async (req, res) => {
     throw new Error('이메일 혹은 비밀번호가 잘못되었습니다!');
   } catch (error) {
     res.status(400).json({ status: 'fail', error: error.message });
+  }
+};
+
+authController.loginWithGoogle = async (req, res) => {
+  try {
+    // 토큰 읽어오기
+    const { token } = req.body;
+    const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
+    const ticket = await googleClient.verifyIdToken({
+      idToken: token,
+      audience: GOOGLE_CLIENT_ID,
+    });
+
+    const { email, name } = ticket.getPayload();
+    console.log('이메일과 이름 !', email, name);
+    let user = await User.findOne({ email });
+    if (!user) {
+      // 처음 로그인 한 유저의 경우 회원가입 먼저 진행
+
+      const randomPassword = '' + Math.floor(Math.random() * 1000000);
+      const salt = await bcrypt.genSalt(10);
+      const newPassword = await bcrypt.hash(randomPassword, salt);
+
+      user = new User({
+        name,
+        email,
+        password: newPassword,
+        contact: '', // 구글로그인시 이메일, 이름만 가져옴 - > 번호는 기본값 설정
+      });
+      await user.save();
+    }
+    const localToken = await user.generateToken();
+    res.status(200).json({ status: 'success', user, token: localToken });
+  } catch (error) {
+    res.status(400).json({ status: 'fail', error: error.message });
+    console.log('에러', error.message);
   }
 };
 
