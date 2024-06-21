@@ -41,4 +41,14 @@ userController.getUser = async (req, res) => {
   }
 };
 
+// 전체 회원리스트  가져오기 (admin)
+userController.getUserList = async (req, res) => {
+  try{
+    const userList = await User.find();
+    res.status(200).json({status:"success", data: userList}) 
+  }catch(error){
+    res.status(400).json({ status: 'error', error: error.message });
+  }
+}
+
 module.exports = userController;
