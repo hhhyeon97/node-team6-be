@@ -11,7 +11,7 @@ const userSchema = Schema(
     name: { type: String, required: true },
     level: { type: String, default: 'normal' }, // 4types: normal, gold, suspend, admin
     image: { type: String, default: '' },
-    contact: { type: String, required: true },
+    contact: { type: String, default: '' },
   },
   { timestamps: true },
 );
