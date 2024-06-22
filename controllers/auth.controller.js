@@ -4,6 +4,7 @@ const authController = {};
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const { OAuth2Client } = require('google-auth-library');
+const axios = require('axios');
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 
@@ -49,7 +50,6 @@ authController.loginWithGoogle = async (req, res) => {
         name,
         email,
         password: newPassword,
-        contact: '', // 구글로그인시 이메일, 이름만 가져옴 - > 번호는 기본값 설정
       });
       await user.save();
     }
@@ -58,6 +58,44 @@ authController.loginWithGoogle = async (req, res) => {
   } catch (error) {
     res.status(400).json({ status: 'fail', error: error.message });
     console.log('에러', error.message);
+  }
+};
+
+authController.loginWithKakao = async (req, res) => {
+  const { token } = req.body;
+  // console.log('토큰 확인', token);
+  try {
+    const kakaoResponse = await axios.get('https://kapi.kakao.com/v2/user/me', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const kakaoProfile = kakaoResponse.data;
+    console.log('프로필 확인', kakaoProfile);
+    const { kakao_account, properties } = kakaoProfile;
+    const email = kakao_account.email;
+    const name = properties.nickname;
+
+    let user = await User.findOne({ email });
+    if (!user) {
+      const randomPassword = '' + Math.floor(Math.random() * 1000000);
+      const salt = await bcrypt.genSalt(10);
+      const newPassword = await bcrypt.hash(randomPassword, salt);
+
+      user = new User({
+        name,
+        email,
+        password: newPassword,
+      });
+      await user.save();
+    }
+
+    const localToken = await user.generateToken();
+    res.status(200).json({ status: 'success', user, token: localToken });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: '카카오 로그인에 실패하였습니다.' });
   }
 };
 
