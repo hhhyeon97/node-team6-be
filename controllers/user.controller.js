@@ -67,19 +67,27 @@ userController.getUserList = async (req, res) => {
       return res.status(200).json(response);
     }
     throw new Error("회원이 없거나 잘못되었습니다");
-    // const userList = await User.find();
-    // res.status(200).json({status:"success", data: userList}) 
+
   }catch(error){
     res.status(400).json({ status: 'error', error: error.message });
   }
 }
 
-// 유저 정보 수정하기 (admin)
-userController.updateSelectedUser = async (req, res) => {
+// 유저 레벨 수정하기 (admin)
+userController.updateUserLevel = async (req, res) => {
   try{
+    const userId = req.params.id;
+    const { level } = req.body;
+    const user = await User.findByIdAndUpdate(
+      userId,
+      {level},
+      {new:true}
+    );
+    if(!user) throw new Error("회원이 존재하지 않습니다");
+    res.status(200).json({status:"success", data: user});
 
   }catch{
-
+    res.status(400).json({ status: 'error', error: error.message });
   }
 }
 
