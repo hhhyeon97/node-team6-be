@@ -3,9 +3,9 @@ const reviewController = {};
 
 
 // 금지어 목록
-const forbiddenWords = ['씨발', '새끼', '좆'];
+const forbiddenWords = ['바보', '멍청이', '새끼'];
 
-// 리뷰 생성
+// [ 리뷰 생성 ]
 reviewController.createReview = async(req, res)=>{
   try{
     let { reviewText, starRate, image } = req.body;
@@ -21,7 +21,7 @@ reviewController.createReview = async(req, res)=>{
 
     // 금지어 검사
     for (let word of forbiddenWords) {
-      if (reviewText.includes(word)) { // 금지어 검사에 일정 횟수 걸리면 계정 정지
+      if (reviewText.includes(word)) { // 금지어 검사에 일정 횟수 걸리면 계정 정지(TO DO)
         throw new Error("부적절한 리뷰입니다");
       }
     }
@@ -32,6 +32,36 @@ reviewController.createReview = async(req, res)=>{
     
   }catch(error){
     res.status(400).json({ status: "fail", error: error.message})
+  }
+}
+
+// [ 전체 리뷰리스트 가져오기 (admin) ]
+reviewController.getReviewList = async(req, res) => {
+  try{
+    const PAGE_SIZE = 1;
+    const { page, name } = req.query;
+    const cond = {
+      // ...name && { name: { $regex: name, $options: "i" } },// userId 없어서 검색못함(TODO)
+    };
+    let query = Review.find(cond).sort({ createdAt: -1 });
+    let response = { status: "success"};
+
+    // if(page){
+    //   query.skip((page-1) * PAGE_SIZE).limit(PAGE_SIZE);
+    //   const totalItemNum = await Review.find(cond).count();
+    //   const totalPageNum = Math.ceil(totalItemNum / PAGE_SIZE);
+    //   response.totalPageNum = totalPageNum;
+    // }
+    
+    const reviewList = await query.exec();
+    response.data = reviewList;
+    
+    if(reviewList){
+      return res.status(200).json(response);
+    }
+    throw new Error("리뷰가 없거나 잘못되었습니다");
+  }catch(error){
+
   }
 }
 
