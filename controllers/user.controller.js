@@ -31,6 +31,7 @@ userController.createUser = async (req, res) => {
 userController.getUser = async (req, res) => {
   try {
     const { userId } = req;
+    console.log('userID', userId)
     const user = await User.findById(userId);
     if (user) {
       return res.status(200).json({ status: 'success', user });
@@ -43,10 +44,10 @@ userController.getUser = async (req, res) => {
 
 // 전체 회원리스트  가져오기 (admin)
 userController.getUserList = async (req, res) => {
-  try{
+  try {
     const userList = await User.find();
-    res.status(200).json({status:"success", data: userList}) 
-  }catch(error){
+    res.status(200).json({ status: "success", data: userList })
+  } catch (error) {
     res.status(400).json({ status: 'error', error: error.message });
   }
 }
