@@ -41,14 +41,14 @@ userController.getUser = async (req, res) => {
   }
 };
 
-// 전체 회원리스트 가져오기 (admin)
+// [ 전체 회원리스트 가져오기 (admin) ]
 userController.getUserList = async (req, res) => {
   try{
     const PAGE_SIZE = 5;
     const { page, name } = req.query;
     const cond = {
       ...name && { name: { $regex: name, $options: "i" } },
-      level : { $ne: 'admin' }
+      level : { $ne: 'admin' } // admin 회원은 리스트에서 제외
     };
     let query = User.find(cond).sort({ createdAt: -1 });
     let response = { status: "success"};
@@ -73,7 +73,7 @@ userController.getUserList = async (req, res) => {
   }
 }
 
-// 유저 레벨 수정하기 (admin)
+// [ 유저 레벨 수정하기 (admin) ]
 userController.updateUserLevel = async (req, res) => {
   try{
     const userId = req.params.id;
@@ -90,5 +90,7 @@ userController.updateUserLevel = async (req, res) => {
     res.status(400).json({ status: 'error', error: error.message });
   }
 }
+
+
 
 module.exports = userController;
