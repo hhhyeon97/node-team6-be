@@ -44,10 +44,11 @@ userController.getUser = async (req, res) => {
 // 전체 회원리스트 가져오기 (admin)
 userController.getUserList = async (req, res) => {
   try{
-    const PAGE_SIZE = 1;
+    const PAGE_SIZE = 5;
     const { page, name } = req.query;
     const cond = {
       ...name && { name: { $regex: name, $options: "i" } },
+      level : { $ne: 'admin' }
     };
     let query = User.find(cond).sort({ createdAt: -1 });
     let response = { status: "success"};
@@ -70,6 +71,15 @@ userController.getUserList = async (req, res) => {
     // res.status(200).json({status:"success", data: userList}) 
   }catch(error){
     res.status(400).json({ status: 'error', error: error.message });
+  }
+}
+
+// 유저 정보 수정하기 (admin)
+userController.updateSelectedUser = async (req, res) => {
+  try{
+
+  }catch{
+
   }
 }
 
