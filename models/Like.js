@@ -3,33 +3,37 @@ const User = require('./User');
 
 const Schema = mongoose.Schema;
 const likeSchema = Schema({
-    // userId:{
-    //     type:mongoose.ObjectId,
-    //     ref:User
-    // },
-    seqId:{
-        type:String,
-        required:true
+    userId:{
+        type:mongoose.ObjectId,
+        ref:User
     },
-    seqImage:{
-        type:String,
-    },
-    seqTo:{
-        type:Date,
-    },
-    seqFrom:{
-        type:Date,
-    },
-    seqLocation:{
-        type:String,
-    },
-    seqPrice:{
-        type:Number,
-    },
-    seqTitle:{
-        type:String,
-        required:true
-    }
+
+    ticket:[{
+        seqId:{
+            type:String,
+            required:true
+        },
+        seqImage:{
+            type:String,
+        },
+        seqTo:{
+            type:Date,
+        },
+        seqFrom:{
+            type:Date,
+        },
+        seqLocation:{
+            type:String,
+        },
+        seqPrice:{
+            type:Number,
+        },
+        seqTitle:{
+            type:String,
+            required:true
+        }    
+    }]
+    
 },{timestamps:true})
 
 likeSchema.methods.toJson = function() {
