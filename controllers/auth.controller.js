@@ -102,7 +102,6 @@ authController.loginWithKakao = async (req, res) => {
 authController.authenticate = async (req, res, next) => {
   try {
     const tokenString = req.headers.authorization;
-    console.log('tokenString:', tokenString)
     if (!tokenString) throw new Error('Token not found.');
     const token = tokenString.replace('Bearer ', '');
     jwt.verify(token, JWT_SECRET_KEY, (error, payload) => {
