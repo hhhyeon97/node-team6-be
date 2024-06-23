@@ -41,11 +41,33 @@ userController.getUser = async (req, res) => {
   }
 };
 
-// 전체 회원리스트  가져오기 (admin)
+// 전체 회원리스트 가져오기 (admin)
 userController.getUserList = async (req, res) => {
   try{
-    const userList = await User.find();
-    res.status(200).json({status:"success", data: userList}) 
+    const PAGE_SIZE = 1;
+    const { page, name } = req.query;
+    const cond = {
+      ...name && { name: { $regex: name, $options: "i" } },
+    };
+    let query = User.find(cond).sort({ createdAt: -1 });
+    let response = { status: "success"};
+
+    if(page){
+      query.skip((page-1) * PAGE_SIZE).limit(PAGE_SIZE);
+      const totalItemNum = await User.find(cond).count();
+      const totalPageNum = Math.ceil(totalItemNum / PAGE_SIZE);
+      response.totalPageNum = totalPageNum;
+    }
+    
+    const userList = await query.exec();
+    response.data = userList;
+    
+    if(userList){
+      return res.status(200).json(response);
+    }
+    throw new Error("회원이 없거나 잘못되었습니다");
+    // const userList = await User.find();
+    // res.status(200).json({status:"success", data: userList}) 
   }catch(error){
     res.status(400).json({ status: 'error', error: error.message });
   }
