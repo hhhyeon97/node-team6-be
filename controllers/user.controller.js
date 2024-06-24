@@ -46,12 +46,12 @@ userController.getUser = async (req, res) => {
 userController.editUser = async (req, res) => {
   try{
     const { userId } = req;
-    const { image, name, email, password, contact } = req.body;
+    const { image, name, email, contact } = req.body;
 
     // 이메일 유효성 검사
-    // if (!validateEmail(email)) {
-    //   throw new Error("유효하지 않은 이메일 형식입니다.");
-    // }
+    if (!validateEmail(email)) {
+      throw new Error("유효하지 않은 이메일 형식입니다.");
+    }
 
     // 이메일 중복 확인
     const existingUser = await User.findOne({ email });
@@ -60,12 +60,12 @@ userController.editUser = async (req, res) => {
     }
 
     // 패스워드 암호화
-    const salt = await bcrypt.genSaltSync(10);
-    password = await bcrypt.hash(password, salt);
+    // const salt = await bcrypt.genSaltSync(10);
+    // password = await bcrypt.hash(password, salt);
 
     const user = await User.findByIdAndUpdate(
       userId,
-      { image, name, email, password, contact },
+      { image, name, email, contact },
       {new:true}
     );
     if(!user) throw new Error("회원이 존재하지 않습니다");
@@ -126,6 +126,11 @@ userController.updateUserLevel = async (req, res) => {
   }
 }
 
+function validateEmail(email) {
+  // 간단한 이메일 형식 검사 예시
+  const re = /.+@.+/;
+  return re.test(email);
+}
 
 
 module.exports = userController;
