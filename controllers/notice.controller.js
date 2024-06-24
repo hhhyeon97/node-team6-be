@@ -36,7 +36,9 @@ noticeController.getNoticeList = async(req, res) => {
     const cond = {
       ...title && { title: { $regex: title, $options: "i" } },
     };
-    let query = Notice.find(cond).sort({ createdAt: -1 });
+    let query = Notice.find(cond)
+    .populate({ path: 'userId', model:'User' })
+    .sort({ createdAt: -1 });
     let response = { status: "success"};
 
     if(page){
