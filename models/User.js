@@ -12,6 +12,10 @@ const userSchema = Schema(
     level: { type: String, default: 'normal' }, // 4types: normal, gold, suspend, admin
     image: { type: String, default: '' },
     contact: { type: String, default: '' },
+    // 비밀번호 재설정 토큰
+    resetPasswordToken: { type: String, default: undefined },
+    // 비밀번호 재설정 토큰 만료 시간
+    resetPasswordExpires: { type: Date, default: undefined },
   },
   { timestamps: true },
 );

@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const nodemailer = require('nodemailer');
 require('dotenv').config();
-
+const FRONTEND_URL = 'http://localhost:3000';
 const passwordController = {};
 
 // 비밀번호 재발급 요청
@@ -33,7 +33,7 @@ passwordController.forgotPassword = async (req, res) => {
       from: 'passwordreset@demo.com',
       subject: '비밀번호 재설정 요청',
       text: `다음 링크를 클릭하여 비밀번호를 재설정하세요:\n\n
-        http://${req.headers.host}/reset-password/${token}\n\n
+        ${FRONTEND_URL}/reset-password/${token}\n\n
         만약 본인이 요청한 것이 아니라면 이 이메일을 무시하세요.`,
     };
 
@@ -57,7 +57,10 @@ passwordController.resetPassword = async (req, res) => {
       resetPasswordExpires: { $gt: Date.now() },
     });
     if (!user) {
-      throw new Error('토큰이 유효하지 않거나 만료되었습니다.');
+      return res.status(400).json({
+        status: 'error',
+        error: '토큰이 유효하지 않거나 만료되었습니다.',
+      });
     }
 
     const salt = await bcrypt.genSaltSync(10);
@@ -71,7 +74,29 @@ passwordController.resetPassword = async (req, res) => {
       message: '비밀번호가 성공적으로 재설정되었습니다.',
     });
   } catch (error) {
-    res.status(400).json({ status: 'error', error: error.message });
+    res.status(500).json({ status: 'error', error: error.message });
+  }
+};
+
+// 비밀번호 재설정 토큰 확인
+passwordController.checkResetToken = async (req, res, next) => {
+  try {
+    const { token } = req.params;
+
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+    if (!user) {
+      return res.status(400).json({
+        status: 'error',
+        error: '토큰이 유효하지 않거나 만료되었습니다.',
+      });
+    }
+
+    next();
+  } catch (error) {
+    res.status(500).json({ status: 'error', error: error.message });
   }
 };
 
