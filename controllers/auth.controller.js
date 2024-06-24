@@ -26,17 +26,56 @@ authController.loginWithEmail = async (req, res) => {
   }
 };
 
+// authController.loginWithGoogle = async (req, res) => {
+//   try {
+//     // 토큰 읽어오기
+//     const { token } = req.body;
+//     const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
+//     const ticket = await googleClient.verifyIdToken({
+//       idToken: token,
+//       audience: GOOGLE_CLIENT_ID,
+//     });
+
+//     const { email, name } = ticket.getPayload();
+//     console.log('이메일과 이름 !', email, name);
+//     let user = await User.findOne({ email });
+//     if (!user) {
+//       // 처음 로그인 한 유저의 경우 회원가입 먼저 진행
+
+//       const randomPassword = '' + Math.floor(Math.random() * 1000000);
+//       const salt = await bcrypt.genSalt(10);
+//       const newPassword = await bcrypt.hash(randomPassword, salt);
+
+//       user = new User({
+//         name,
+//         email,
+//         password: newPassword,
+//       });
+//       await user.save();
+//     }
+//     const localToken = await user.generateToken();
+//     res.status(200).json({ status: 'success', user, token: localToken });
+//   } catch (error) {
+//     res.status(400).json({ status: 'fail', error: error.message });
+//     console.log('에러', error.message);
+//   }
+// };
+
 authController.loginWithGoogle = async (req, res) => {
   try {
-    // 토큰 읽어오기
     const { token } = req.body;
-    const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
-    const ticket = await googleClient.verifyIdToken({
-      idToken: token,
-      audience: GOOGLE_CLIENT_ID,
-    });
 
-    const { email, name } = ticket.getPayload();
+    const googleUserData = await axios.get(
+      `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${token}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: 'application/json',
+        },
+      },
+    );
+
+    const { email, name } = googleUserData.data;
     console.log('이메일과 이름 !', email, name);
     let user = await User.findOne({ email });
     if (!user) {
