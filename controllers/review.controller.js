@@ -8,7 +8,16 @@ const forbiddenWords = ['바보', '멍청이', '새끼'];
 // [ 리뷰 생성 ]
 reviewController.createReview = async(req, res)=>{
   try{
-    let { reviewText, starRate, image } = req.body;
+    const { userId } = req;
+    let { reviewText, starRate, image, reserveId } = req.body;
+    console.log('공연번호',reserveId);
+
+    // 예매 여부 검사
+    if(!reserveId) throw new Error("예매 내역이 없습니다")
+
+    // 이미 리뷰가 존재하는지 확인
+    const existingReview = await Review.findOne({ reservationId: reserveId, userId: userId });
+    if (existingReview) throw new Error("이미 이 예매에 대한 리뷰를 남기셨습니다.");
 
     // 리뷰 내용 검사
     if(!reviewText.trim()) throw new Error("리뷰를 작성해주세요")
@@ -26,7 +35,7 @@ reviewController.createReview = async(req, res)=>{
       }
     }
 
-    const review = new Review({reviewText, starRate, image});
+    const review = new Review({reviewText, starRate, image, userId, reservationId:reserveId});
     await review.save();
     res.status(200).json({ status: "success", data: review })
     
