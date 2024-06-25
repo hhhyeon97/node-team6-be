@@ -10,7 +10,6 @@ reviewController.createReview = async(req, res)=>{
   try{
     const { userId } = req;
     let { reviewText, starRate, image, reserveId } = req.body;
-    console.log('공연번호',reserveId);
 
     // 예매 여부 검사
     if(!reserveId) throw new Error("예매 내역이 없습니다")
@@ -39,6 +38,21 @@ reviewController.createReview = async(req, res)=>{
     await review.save();
     res.status(200).json({ status: "success", data: review })
     
+  }catch(error){
+    res.status(400).json({ status: "fail", error: error.message})
+  }
+}
+
+// [ 해당 예매에 내가 쓴 리뷰가 있는지 확인 ]
+reviewController.checkReviewed = async(req, res)=>{
+  try{
+    const { userId } = req;
+    let { reserveId } = req.params;
+
+    const existingReview = await Review.findOne({ reservationId: reserveId, userId: userId });
+
+    res.status(200).json({ status: "success", data: existingReview })
+
   }catch(error){
     res.status(400).json({ status: "fail", error: error.message})
   }
