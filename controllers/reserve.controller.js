@@ -29,4 +29,17 @@ reserveController.createReserve = async (req, res) => {
     }
 }
 
+reserveController.getReserve = async (req, res) => {
+  try{
+    const { userId } = req;
+    const myReserve = await Reservation.find({userId});
+    if(!myReserve) throw new Error("예약내역이 없습니다");
+
+    res.status(200).json({ status: 'success', data: myReserve })
+
+  }catch(error){
+    return res.status(400).json({ status: "fail", error: error.message })
+  }
+}
+
 module.exports = reserveController
