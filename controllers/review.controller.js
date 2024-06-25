@@ -1,4 +1,5 @@
 const Review = require('../models/Review');
+const Reservation = require('../models/Reservation');
 const reviewController = {};
 
 
@@ -6,21 +7,21 @@ const reviewController = {};
 const forbiddenWords = ['바보', '멍청이', '새끼'];
 
 // [ 리뷰 생성 ]
-reviewController.createReview = async(req, res)=>{
-  try{
+reviewController.createReview = async (req, res) => {
+  try {
     const { userId } = req;
     let { reviewText, starRate, image, reserveId } = req.body;
 
     // 예매 여부 검사
-    if(!reserveId) throw new Error("예매 내역이 없습니다")
+    if (!reserveId) throw new Error("예매 내역이 없습니다")
 
     // 이미 리뷰가 존재하는지 확인
     const existingReview = await Review.findOne({ reservationId: reserveId, userId: userId });
     if (existingReview) throw new Error("이미 이 예매에 대한 리뷰를 남기셨습니다.");
 
     // 리뷰 내용 검사
-    if(!reviewText.trim()) throw new Error("리뷰를 작성해주세요")
-    if(reviewText.length < 15) throw new Error("최소 15자 이상 작성해주세요")
+    if (!reviewText.trim()) throw new Error("리뷰를 작성해주세요")
+    if (reviewText.length < 15) throw new Error("최소 15자 이상 작성해주세요")
 
     // 별점 검사
     if (starRate < 0 || starRate > 5) {
@@ -34,18 +35,18 @@ reviewController.createReview = async(req, res)=>{
       }
     }
 
-    const review = new Review({reviewText, starRate, image, userId, reservationId:reserveId});
+    const review = new Review({ reviewText, starRate, image, userId, reservationId: reserveId });
     await review.save();
     res.status(200).json({ status: "success", data: review })
-    
-  }catch(error){
-    res.status(400).json({ status: "fail", error: error.message})
+
+  } catch (error) {
+    res.status(400).json({ status: "fail", error: error.message })
   }
 }
 
 // [ 해당 예매에 내가 쓴 리뷰가 있는지 확인 ]
-reviewController.checkReviewed = async(req, res)=>{
-  try{
+reviewController.checkReviewed = async (req, res) => {
+  try {
     const { userId } = req;
     let { reserveId } = req.params;
 
@@ -53,21 +54,21 @@ reviewController.checkReviewed = async(req, res)=>{
 
     res.status(200).json({ status: "success", data: existingReview })
 
-  }catch(error){
-    res.status(400).json({ status: "fail", error: error.message})
+  } catch (error) {
+    res.status(400).json({ status: "fail", error: error.message })
   }
 }
 
 // [ 전체 리뷰리스트 가져오기 (admin) ]
-reviewController.getReviewList = async(req, res) => {
-  try{
+reviewController.getReviewList = async (req, res) => {
+  try {
     const PAGE_SIZE = 1;
     const { page, name } = req.query;
     const cond = {
       // ...name && { name: { $regex: name, $options: "i" } },// userId 없어서 검색못함(TODO)
     };
     let query = Review.find(cond).sort({ createdAt: -1 });
-    let response = { status: "success"};
+    let response = { status: "success" };
 
     // if(page){
     //   query.skip((page-1) * PAGE_SIZE).limit(PAGE_SIZE);
@@ -75,16 +76,39 @@ reviewController.getReviewList = async(req, res) => {
     //   const totalPageNum = Math.ceil(totalItemNum / PAGE_SIZE);
     //   response.totalPageNum = totalPageNum;
     // }
-    
+
     const reviewList = await query.exec();
     response.data = reviewList;
-    
-    if(reviewList){
+
+    if (reviewList) {
       return res.status(200).json(response);
     }
     throw new Error("리뷰가 없거나 잘못되었습니다");
-  }catch(error){
+  } catch (error) {
 
+  }
+}
+
+// [ 전체 리뷰리스트 가져오기 (admin) ]
+reviewController.getAllReviewList = async (req, res) => {
+  try {
+    const { Id } = req.query;
+    console.log("id:", Id)
+
+    const reservationsList = await Reservation.find({ 'ticket.SeqId': Id }, 'reservationId'); // 디테일 페이지에서의 공연 id를 가진 예약 정보만 출력 
+    const reservationIds = reservationsList.map(reservation => reservation.reservationId);  // reservationId만 뽑기
+    const reviewAllList = await Review.find().sort({ createdAt: -1 });  // 리뷰 전체 가져오기
+
+    const list = reviewAllList.filter(review => reservationIds.includes(review.reservationId.toString()));
+
+    console.log("reservationsList", reservationsList)
+    console.log('reviewAllList', reviewAllList)
+
+    console.log("Filtered review list:", list);
+    // res.status(200).json({ status: "success", matchingData: reservationsList });
+
+  } catch (error) {
+    return res.status(400).json({ status: "fail", error: error.message })
   }
 }
 
