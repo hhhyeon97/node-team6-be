@@ -1,17 +1,17 @@
 const mongoose = require("mongoose")
 const Schema = mongoose.Schema
 const User = require('./User');
-// const Reservation = require('./Reservation');
+const Reservation = require('./Reservation');
 
 const reviewSchema = Schema({
-  // userId: {
-  //   type: mongoose.ObjectId,
-  //   ref: User
-  // },
-  // reservationId: {
-  //   type: mongoose.ObjectId,
-  //   ref: Reservation
-  // },
+  userId: {
+    type: mongoose.ObjectId,
+    ref: User
+  },
+  reservationId: {
+    type: mongoose.ObjectId,
+    ref: Reservation
+  },
   reviewText: {
     type: String,
     required: true
