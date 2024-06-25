@@ -8,7 +8,7 @@ const likeSchema = Schema({
         ref:User
     },
 
-    ticket:[{
+    items:[{
         seqId:{
             type:String,
             required:true
@@ -17,16 +17,13 @@ const likeSchema = Schema({
             type:String,
         },
         seqTo:{
-            type:Date,
+            type:String,
         },
         seqFrom:{
-            type:Date,
+            type:String,
         },
         seqLocation:{
             type:String,
-        },
-        seqPrice:{
-            type:Number,
         },
         seqTitle:{
             type:String,

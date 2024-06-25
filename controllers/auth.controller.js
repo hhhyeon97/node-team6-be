@@ -92,6 +92,7 @@ authController.loginWithGoogle = async (req, res) => {
       });
       await user.save();
     }
+
     const localToken = await user.generateToken();
     res.status(200).json({ status: 'success', user, token: localToken });
   } catch (error) {
