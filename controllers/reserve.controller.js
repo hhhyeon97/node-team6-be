@@ -81,14 +81,22 @@ reserveController.getReserveDetail = async (req, res) => {
 reserveController.cancelReserve = async (req, res) => {
   try{
     const reserveId = req.params.id;
-    console.log("id", reserveId)
 
-    const reserve = await Reservation.findByIdAndUpdate(
-      reserveId,
-      { $set: { isCanceled: true } },
-      { new: true }
-    );
-    if(!reserve) throw new Error("예약이 존재하지 않습니다");
+    // 먼저 예약을 찾아서 isCanceled 상태를 확인
+    const reserve = await Reservation.findById(reserveId);
+
+    if (!reserve) {
+      throw new Error("예약이 존재하지 않습니다");
+    }
+
+    if (reserve.isCanceled) {
+      throw new Error("이미 취소된 예약입니다");
+    }
+
+    // 예약을 취소 상태로 업데이트
+    reserve.isCanceled = true;
+    await reserve.save();
+
     res.status(200).json({status:"success", data: reserve})     
     
   }catch(error){
