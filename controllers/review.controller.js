@@ -1,5 +1,6 @@
 const Review = require('../models/Review');
 const Reservation = require('../models/Reservation');
+const { response } = require('express');
 const reviewController = {};
 
 
@@ -49,10 +50,10 @@ reviewController.checkReviewed = async (req, res) => {
   try {
     const { userId } = req;
     let { reserveId } = req.params;
-
     const existingReview = await Review.findOne({ reservationId: reserveId, userId: userId });
-
-    res.status(200).json({ status: "success", data: existingReview })
+    // console.log('예매공연',reserveId,'의 리뷰는',existingReview)
+    res.status(200).json({ status: "success", data: existingReview})
+    // return res.status(200).json(response.data);
 
   } catch (error) {
     res.status(400).json({ status: "fail", error: error.message })
