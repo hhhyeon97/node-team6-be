@@ -77,4 +77,23 @@ reserveController.getReserveDetail = async (req, res) => {
   }
 }
 
+// [ 예매취소(mypage) ]
+reserveController.cancelReserve = async (req, res) => {
+  try{
+    const reserveId = req.params.id;
+    console.log("id", reserveId)
+
+    const reserve = await Reservation.findByIdAndUpdate(
+      reserveId,
+      { $set: { isCanceled: true } },
+      { new: true }
+    );
+    if(!reserve) throw new Error("예약이 존재하지 않습니다");
+    res.status(200).json({status:"success", data: reserve})     
+    
+  }catch(error){
+    return res.status(400).json({ status: "fail", error: error.message })
+  }
+}
+
 module.exports = reserveController
