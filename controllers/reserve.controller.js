@@ -19,6 +19,7 @@ reserveController.createReserve = async (req, res) => {
       userId,
       SeqPrice,
       ticket,
+      isReview:false,
     })
 
     await newReservation.save()
@@ -125,6 +126,20 @@ reserveController.getReserveByDate = async (req, res) => {
 
   } catch (error) {
     return res.status(400).json({ status: "fail", error: error.message })
+  }
+}
+
+reserveController.updateReview = async (reserveId) => {
+  try{
+    const reserve = await Reservation.findById(reserveId);
+    if(reserve.isReview) throw new Error ("이미 리뷰가 존재합니다!");
+    let newReview = {...reserve.ticket};
+    newReview.isReview = true;
+    reserve.ticket = newReview;
+    await reserve.save();
+    
+  }catch(error){
+    throw new Error(error.message);
   }
 }
 

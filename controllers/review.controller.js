@@ -3,6 +3,7 @@ const Reservation = require('../models/Reservation');
 const User = require('../models/User');
 const { response } = require('express');
 const reviewController = {};
+const reserveController = require('./reserve.controller');
 
 
 // 금지어 목록
@@ -37,6 +38,8 @@ reviewController.createReview = async (req, res) => {
       }
     }
 
+    await reserveController.updateReview(reserveId);
+
     const review = new Review({ reviewText, starRate, image, userId, reservationId: reserveId });
     await review.save();
     res.status(200).json({ status: "success", data: review })
@@ -47,19 +50,19 @@ reviewController.createReview = async (req, res) => {
 }
 
 // [ 해당 예매에 내가 쓴 리뷰가 있는지 확인 ]
-reviewController.checkReviewed = async (req, res) => {
-  try {
-    const { userId } = req;
-    let { reserveId } = req.params;
-    const existingReview = await Review.findOne({ reservationId: reserveId, userId: userId });
-    // console.log('예매공연',reserveId,'의 리뷰는',existingReview)
-    res.status(200).json({ status: "success", data: existingReview })
-    // return res.status(200).json(response.data);
+// reviewController.checkReviewed = async (req, res) => {
+//   try {
+//     const { userId } = req;
+//     let { reserveId } = req.params;
+//     const existingReview = await Review.findOne({ reservationId: reserveId, userId: userId });
+//     // console.log('예매공연',reserveId,'의 리뷰는',existingReview)
+//     res.status(200).json({ status: "success", data: existingReview })
+//     // return res.status(200).json(response.data);
 
-  } catch (error) {
-    res.status(400).json({ status: "fail", error: error.message })
-  }
-}
+//   } catch (error) {
+//     res.status(400).json({ status: "fail", error: error.message })
+//   }
+// }
 
 // [ 전체 리뷰리스트 가져오기 (admin) ]
 reviewController.getReviewList = async (req, res) => {
