@@ -59,4 +59,22 @@ reserveController.getReserve = async (req, res) => {
   }
 }
 
+// [ 예매상세 내역 가져오기 ]
+reserveController.getReserveDetail = async (req, res) => {
+  try{
+    const { userId } = req;
+    const reserveId = req.params.id;
+
+    const reserve = await Reservation.findById(reserveId)
+      .populate({ path: 'userId', model:'User' })
+
+    if(!reserve) throw new Error('예약상세 내역이 없습니다')
+    
+    res.status(200).json({ status: 'success', data: reserve })
+
+  }catch(error){
+  return res.status(400).json({ status: "fail", error: error.message })
+  }
+}
+
 module.exports = reserveController
