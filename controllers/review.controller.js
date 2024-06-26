@@ -1,5 +1,6 @@
 const Review = require('../models/Review');
 const Reservation = require('../models/Reservation');
+const User = require('../models/User');
 const { response } = require('express');
 const reviewController = {};
 
@@ -52,7 +53,7 @@ reviewController.checkReviewed = async (req, res) => {
     let { reserveId } = req.params;
     const existingReview = await Review.findOne({ reservationId: reserveId, userId: userId });
     // console.log('예매공연',reserveId,'의 리뷰는',existingReview)
-    res.status(200).json({ status: "success", data: existingReview})
+    res.status(200).json({ status: "success", data: existingReview })
     // return res.status(200).json(response.data);
 
   } catch (error) {
@@ -90,23 +91,30 @@ reviewController.getReviewList = async (req, res) => {
   }
 }
 
-// [ 전체 리뷰리스트 가져오기 (admin) ]
+// [ 전체 리뷰리스트 가져오기 (detail) ]
 reviewController.getAllReviewList = async (req, res) => {
   try {
     const { Id } = req.query;
-    console.log("id:", Id)
 
-    const reservationsList = await Reservation.find({ 'ticket.SeqId': Id }, 'reservationId'); // 디테일 페이지에서의 공연 id를 가진 예약 정보만 출력 
-    const reservationIds = reservationsList.map(reservation => reservation.reservationId);  // reservationId만 뽑기
+    const reservationsList = await Reservation.find({ 'ticket.SeqId': Id }, '_id'); // 디테일 페이지에서의 공연 id를 가진 예약 정보만 출력 
     const reviewAllList = await Review.find().sort({ createdAt: -1 });  // 리뷰 전체 가져오기
 
-    const list = reviewAllList.filter(review => reservationIds.includes(review.reservationId.toString()));
+    const reservationIds = reservationsList.map(reservation => reservation._id.toString());  // reservationId만 뽑기
+    const matchingData = reviewAllList.filter(review => reservationIds.includes(review.reservationId.toString()));
 
-    console.log("reservationsList", reservationsList)
-    console.log('reviewAllList', reviewAllList)
+    const resultData = []
+    for (const review of matchingData) {
+      const user = await User.findOne({ '_id': review.userId.toString() }, 'name'); // 각 userId에 대해 사용자 이름을 가져옴
 
-    console.log("Filtered review list:", list);
-    // res.status(200).json({ status: "success", matchingData: reservationsList });
+      if (user) {
+        resultData.push({
+          ...review.toObject(),
+          nickName: user.name       // 닉네임 객체 추가
+        })
+      }
+    }
+
+    res.status(200).json({ status: "success", matchingData: resultData });
 
   } catch (error) {
     return res.status(400).json({ status: "fail", error: error.message })
