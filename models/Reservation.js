@@ -19,7 +19,8 @@ const reservationSchema = Schema({
         SeqTitle: { type: String, required: true },
         SeqLocation: { type: String, required: true },
         SeqFrom: { type: String, required: true },
-        SeqTo: { type: String, required: true }
+        SeqTo: { type: String, required: true },
+        isReview:{ type: Boolean, default: false}
     },
 
 }, { timestamps: true })
