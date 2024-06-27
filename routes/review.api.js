@@ -3,13 +3,20 @@ const router = express.Router();
 const reviewController = require('../controllers/review.controller');
 const authController = require('../controllers/auth.controller');
 
-router.post("/", authController.authenticate, reviewController.createReview);
-// router.get("/check/:reserveId", authController.authenticate, reviewController.checkReviewed)
-
 router.get("/all", reviewController.getAllReviewList);
+
 // mypage
 router.get("/my", authController.authenticate, reviewController.getMyReviewList);
+router.post("/", authController.authenticate, reviewController.createReview);
+
 // admin
-router.get("/", reviewController.getReviewList);
+router.get("/", 
+  authController.authenticate, 
+  authController.checkAdminPermission, 
+  reviewController.getReviewList);
+router.put("/:id", 
+  authController.authenticate, 
+  authController.checkAdminPermission,
+  reviewController.editReviewState);
 
 module.exports = router;

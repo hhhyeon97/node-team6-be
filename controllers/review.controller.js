@@ -66,7 +66,7 @@ reviewController.createReview = async (req, res) => {
 // [ 전체 리뷰리스트 가져오기 (admin) ]
 reviewController.getReviewList = async (req, res) => {
   try {
-    const PAGE_SIZE = 2;
+    const PAGE_SIZE = 5;
     const { page, name } = req.query;
 
     let cond = {};
@@ -107,6 +107,28 @@ reviewController.getReviewList = async (req, res) => {
     throw new Error("리뷰가 없거나 잘못되었습니다");
 
   } catch (error) {
+    return res.status(400).json({ status: "fail", error: error.message })
+  }
+}
+
+// [ 리뷰상태 수정하기 - 숨김처리 (admin)]
+reviewController.editReviewState = async (req, res) => {
+  try{
+    const reviewId = req.params.id;
+    const { isSuspended } = req.body;
+
+    const review = await Review.findById(reviewId);
+    if (!review) {
+        throw new Error("리뷰가 존재하지 않습니다");
+    }
+
+    // 공지사항 수정
+    review.isSuspended = isSuspended;
+
+    await review.save();
+    res.status(200).json({ status: "success", data: review });
+
+  }catch(error){
     return res.status(400).json({ status: "fail", error: error.message })
   }
 }
