@@ -28,6 +28,6 @@ router.delete(
   noticeController.deleteNotice,
 );
 
-router.get('/user-notice', noticeController.getNoticeList);
+router.get('/user-notice', noticeController.getNoticeListVer2);
 
 module.exports = router;
