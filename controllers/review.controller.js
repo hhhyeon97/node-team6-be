@@ -1,7 +1,6 @@
 const Review = require('../models/Review');
 const Reservation = require('../models/Reservation');
 const User = require('../models/User');
-const { response } = require('express');
 const reviewController = {};
 const reserveController = require('./reserve.controller');
 
@@ -69,11 +68,27 @@ reviewController.getReviewList = async (req, res) => {
   try {
     const PAGE_SIZE = 1;
     const { page, name } = req.query;
-    const cond = {
-      // ...name && { name: { $regex: name, $options: "i" } },// userId 없어서 검색못함(TODO)
-    };
-    let query = Review.find(cond).sort({ createdAt: -1 });
-    let response = { status: "success" };
+
+    // let cond = {};  
+    //   if (name) {
+    //     cond['userId.name'] = { $regex: name, $options: "i" }
+    //     // cond = { name: { $regex: name, $options: "i" } }
+    //   }
+
+
+      let query = Review.find()
+      .populate(
+        'userId' 
+      )
+      .populate({
+        path: 'reservationId',
+        populate: {
+          path: 'ticket' 
+        }
+      })
+      .sort({ createdAt: -1 });
+
+    // let response = { status: "success" };
 
     // if(page){
     //   query.skip((page-1) * PAGE_SIZE).limit(PAGE_SIZE);
@@ -82,13 +97,22 @@ reviewController.getReviewList = async (req, res) => {
     //   response.totalPageNum = totalPageNum;
     // }
 
-    const reviewList = await query.exec();
-    response.data = reviewList;
+    // const totalItemNum = await Review.countDocuments(cond);
+    // const totalPageNum = Math.ceil(totalItemNum / PAGE_SIZE);
+    
+    // query = query.skip((page - 1) * PAGE_SIZE).limit(PAGE_SIZE);
 
-    if (reviewList) {
-      return res.status(200).json(response);
+    const reviewList = await query.exec();
+
+    if (reviewList.length > 0) {
+      return res.status(200).json({ status: "success", data: reviewList  });
+    } else {
+      throw new Error("리뷰가 없거나 잘못되었습니다");
     }
-    throw new Error("리뷰가 없거나 잘못되었습니다");
+    // if (reviewList) {
+    //   return res.status(200).json(response);
+    // }
+    // throw new Error("리뷰가 없거나 잘못되었습니다");
   } catch (error) {
 
   }
