@@ -19,6 +19,7 @@ reserveController.createReserve = async (req, res) => {
       userId,
       SeqPrice,
       ticket,
+      isReview: false,
     })
 
     await newReservation.save()
@@ -61,25 +62,25 @@ reserveController.getReserve = async (req, res) => {
 
 // [ 예매상세 내역 가져오기 ]
 reserveController.getReserveDetail = async (req, res) => {
-  try{
+  try {
     const { userId } = req;
     const reserveId = req.params.id;
 
     const reserve = await Reservation.findById(reserveId)
-      .populate({ path: 'userId', model:'User' })
+      .populate({ path: 'userId', model: 'User' })
 
-    if(!reserve) throw new Error('예약상세 내역이 없습니다')
-    
+    if (!reserve) throw new Error('예약상세 내역이 없습니다')
+
     res.status(200).json({ status: 'success', data: reserve })
 
-  }catch(error){
-  return res.status(400).json({ status: "fail", error: error.message })
+  } catch (error) {
+    return res.status(400).json({ status: "fail", error: error.message })
   }
 }
 
 // [ 예매취소(mypage) ]
 reserveController.cancelReserve = async (req, res) => {
-  try{
+  try {
     const reserveId = req.params.id;
 
     // 먼저 예약을 찾아서 isCanceled 상태를 확인
@@ -97,10 +98,53 @@ reserveController.cancelReserve = async (req, res) => {
     reserve.isCanceled = true;
     await reserve.save();
 
-    res.status(200).json({status:"success", data: reserve})     
-    
-  }catch(error){
+    res.status(200).json({ status: "success", data: reserve })
+
+  } catch (error) {
     return res.status(400).json({ status: "fail", error: error.message })
+  }
+}
+
+// [ 나의 예매 내역 가져오기 ] 날짜기준
+reserveController.getReserveByDate = async (req, res) => {
+  try {
+    const PAGE_SIZE = 10;
+    const { userId } = req;
+    const { page } = req.query;
+    const { formatDate } = req.body
+
+    const startofDay = new Date(formatDate);
+    startofDay.setHours(0, 0, 0, 0)       // 하루의 시작
+
+    const endOfDay = new Date(formatDate);
+    endOfDay.setHours(23, 59, 59, 999); // 하루의 끝
+
+    let query = await Reservation.find({
+      userId,
+      reservationDate: {
+        $gte: startofDay,
+        $lt: endOfDay
+      }
+    }).sort({ createdAt: -1 });
+
+    res.status(200).json({ status: "success", ReserveByDate: query });
+
+  } catch (error) {
+    return res.status(400).json({ status: "fail", error: error.message })
+  }
+}
+
+reserveController.updateReview = async (reserveId) => {
+  try {
+    const reserve = await Reservation.findById(reserveId);
+    if (reserve.isReview) throw new Error("이미 리뷰가 존재합니다!");
+    let newReview = { ...reserve.ticket };
+    newReview.isReview = true;
+    reserve.ticket = newReview;
+    await reserve.save();
+
+  } catch (error) {
+    throw new Error(error.message);
   }
 }
 
