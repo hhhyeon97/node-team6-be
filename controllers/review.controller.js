@@ -66,55 +66,44 @@ reviewController.createReview = async (req, res) => {
 // [ 전체 리뷰리스트 가져오기 (admin) ]
 reviewController.getReviewList = async (req, res) => {
   try {
-    const PAGE_SIZE = 1;
+    const PAGE_SIZE = 2;
     const { page, name } = req.query;
 
-    // let cond = {};  
-    //   if (name) {
-    //     cond['userId.name'] = { $regex: name, $options: "i" }
-    //     // cond = { name: { $regex: name, $options: "i" } }
-    //   }
+    let cond = {};
 
+    if(name){
+      cond['userId.name'] = { $regex: name, $options: "i" };
+    } 
 
-      let query = Review.find()
-      .populate(
-        'userId' 
-      )
-      .populate({
-        path: 'reservationId',
-        populate: {
-          path: 'ticket' 
-        }
-      })
-      .sort({ createdAt: -1 });
+    let query = Review.find(cond)
+    .populate('userId')
+    .populate({
+      path: 'reservationId',
+      populate: {
+        path: 'ticket' 
+      }
+    })
+    .sort({ createdAt: -1 });
 
-    // let response = { status: "success" };
+    let response = { status: "success" };
 
-    // if(page){
-    //   query.skip((page-1) * PAGE_SIZE).limit(PAGE_SIZE);
-    //   const totalItemNum = await Review.find(cond).count();
-    //   const totalPageNum = Math.ceil(totalItemNum / PAGE_SIZE);
-    //   response.totalPageNum = totalPageNum;
-    // }
-
-    // const totalItemNum = await Review.countDocuments(cond);
-    // const totalPageNum = Math.ceil(totalItemNum / PAGE_SIZE);
-    
-    // query = query.skip((page - 1) * PAGE_SIZE).limit(PAGE_SIZE);
+    if(page){
+      query.skip((page-1) * PAGE_SIZE).limit(PAGE_SIZE);
+      const totalItemNum = await Review.find(cond).count();
+      const totalPageNum = Math.ceil(totalItemNum / PAGE_SIZE);
+      response.totalPageNum = totalPageNum;
+    }
 
     const reviewList = await query.exec();
-
-    if (reviewList.length > 0) {
-      return res.status(200).json({ status: "success", data: reviewList  });
-    } else {
-      throw new Error("리뷰가 없거나 잘못되었습니다");
+    response.data = reviewList;
+    
+    if(reviewList){
+      return res.status(200).json(response);
     }
-    // if (reviewList) {
-    //   return res.status(200).json(response);
-    // }
-    // throw new Error("리뷰가 없거나 잘못되었습니다");
-  } catch (error) {
+    throw new Error("리뷰가 없거나 잘못되었습니다");
 
+  } catch (error) {
+    return res.status(400).json({ status: "fail", error: error.message })
   }
 }
 
