@@ -9,5 +9,6 @@ router.post("/", authController.authenticate, reviewController.createReview);
 
 router.get("/", reviewController.getReviewList);
 router.get("/all", reviewController.getAllReviewList);
+router.get("/my", authController.authenticate, reviewController.getMyReviewList);
 
 module.exports = router;

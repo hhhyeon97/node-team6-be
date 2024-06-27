@@ -124,4 +124,32 @@ reviewController.getAllReviewList = async (req, res) => {
   }
 }
 
+// 나의 리뷰 리스트 가져오기
+reviewController.getMyReviewList = async (req, res) => {
+  try {
+    const { userId } = req
+
+    const reviewMyList = await Review.find({ userId }).sort({ createdAt: -1 });  // 리뷰 전체 가져오기
+    console.log('reviewMyList', reviewMyList)
+
+    const resultData = []
+    for (const review of reviewMyList) {
+      const performance = await Reservation.findOne({ '_id': review.reservationId.toString() }, 'ticket.SeqTitle'); // 각 userId에 대해 사용자 이름을 가져옴
+
+      if (performance) {
+        resultData.push({
+          ...review.toObject(),
+          SeqTitle: performance.ticket.SeqTitle,       // 공연 이름 객체 추가
+        })
+      }
+    }
+
+    res.status(200).json({ status: "success", data: resultData });
+
+  } catch (error) {
+    return res.status(400).json({ status: "fail", error: error.message })
+  }
+}
+
+
 module.exports = reviewController;
