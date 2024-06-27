@@ -72,7 +72,11 @@ reviewController.getReviewList = async (req, res) => {
     let cond = {};
 
     if(name){
-      cond['userId.name'] = { $regex: name, $options: "i" };
+      // userId를 참조하여 사용자 이름 검색
+      const users = await User.find({ name: { $regex: name, $options: "i" } }).select('_id');
+      const userIds = users.map(user => user._id);
+      // userId가 검색 조건에 포함되어야 함
+      cond.userId = { $in: userIds };
     } 
 
     let query = Review.find(cond)
