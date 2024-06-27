@@ -227,5 +227,22 @@ reviewController.editReview = async (req, res) => {
   }
 }
 
+// [ 나의 리뷰 삭제 ]
+reviewController.deleteReview = async (req, res) => {
+  try{
+    const reviewId = req.params.id;
+    if (!reviewId) {
+      throw new Error("리뷰가 존재하지 않습니다");
+    }
+
+    const review = await Review.findByIdAndDelete(reviewId);
+
+    res.status(200).json({ status: "success", data: review })
+
+  }catch(error){
+    return res.status(400).json({ status: "fail", error: error.message })
+  }
+}
+
 
 module.exports = reviewController;
