@@ -8,6 +8,7 @@ router.get("/all", reviewController.getAllReviewList);
 // mypage
 router.get("/my", authController.authenticate, reviewController.getMyReviewList);
 router.post("/", authController.authenticate, reviewController.createReview);
+router.put("/", authController.authenticate, reviewController.editReview);
 
 // admin
 router.get("/", 
