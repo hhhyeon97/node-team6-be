@@ -1,7 +1,6 @@
 const Review = require('../models/Review');
 const Reservation = require('../models/Reservation');
 const User = require('../models/User');
-const { response } = require('express');
 const reviewController = {};
 const reserveController = require('./reserve.controller');
 
@@ -67,30 +66,70 @@ reviewController.createReview = async (req, res) => {
 // [ 전체 리뷰리스트 가져오기 (admin) ]
 reviewController.getReviewList = async (req, res) => {
   try {
-    const PAGE_SIZE = 1;
+    const PAGE_SIZE = 5;
     const { page, name } = req.query;
-    const cond = {
-      // ...name && { name: { $regex: name, $options: "i" } },// userId 없어서 검색못함(TODO)
-    };
-    let query = Review.find(cond).sort({ createdAt: -1 });
+
+    let cond = {};
+
+    if(name){
+      // userId를 참조하여 사용자 이름 검색
+      const users = await User.find({ name: { $regex: name, $options: "i" } }).select('_id');
+      const userIds = users.map(user => user._id);
+      // userId가 검색 조건에 포함되어야 함
+      cond.userId = { $in: userIds };
+    } 
+
+    let query = Review.find(cond)
+    .populate('userId')
+    .populate({
+      path: 'reservationId',
+      populate: {
+        path: 'ticket' 
+      }
+    })
+    .sort({ createdAt: -1 });
+
     let response = { status: "success" };
 
-    // if(page){
-    //   query.skip((page-1) * PAGE_SIZE).limit(PAGE_SIZE);
-    //   const totalItemNum = await Review.find(cond).count();
-    //   const totalPageNum = Math.ceil(totalItemNum / PAGE_SIZE);
-    //   response.totalPageNum = totalPageNum;
-    // }
+    if(page){
+      query.skip((page-1) * PAGE_SIZE).limit(PAGE_SIZE);
+      const totalItemNum = await Review.find(cond).count();
+      const totalPageNum = Math.ceil(totalItemNum / PAGE_SIZE);
+      response.totalPageNum = totalPageNum;
+    }
 
     const reviewList = await query.exec();
     response.data = reviewList;
-
-    if (reviewList) {
+    
+    if(reviewList){
       return res.status(200).json(response);
     }
     throw new Error("리뷰가 없거나 잘못되었습니다");
-  } catch (error) {
 
+  } catch (error) {
+    return res.status(400).json({ status: "fail", error: error.message })
+  }
+}
+
+// [ 리뷰상태 수정하기 - 숨김처리 (admin)]
+reviewController.editReviewState = async (req, res) => {
+  try{
+    const reviewId = req.params.id;
+    const { isSuspended } = req.body;
+
+    const review = await Review.findById(reviewId);
+    if (!review) {
+        throw new Error("리뷰가 존재하지 않습니다");
+    }
+
+    // 공지사항 수정
+    review.isSuspended = isSuspended;
+
+    await review.save();
+    res.status(200).json({ status: "success", data: review });
+
+  }catch(error){
+    return res.status(400).json({ status: "fail", error: error.message })
   }
 }
 
