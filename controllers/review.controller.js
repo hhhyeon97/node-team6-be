@@ -9,6 +9,7 @@ const reserveController = require('./reserve.controller');
 const forbiddenWords = ['바보', '멍청이', '새끼'];
 
 // [ 리뷰 작성 ]
+// [ 리뷰 작성 ]
 reviewController.createReview = async (req, res) => {
   try {
     const { userId } = req;
@@ -231,9 +232,12 @@ reviewController.editReview = async (req, res) => {
 reviewController.deleteReview = async (req, res) => {
   try{
     const reviewId = req.params.id;
+    const reviewItem = await Review.findById(reviewId)
+    const reserveId = reviewItem.reservationId;
     if (!reviewId) {
       throw new Error("리뷰가 존재하지 않습니다");
     }
+    await reserveController.deleteReview(reserveId);
 
     const review = await Review.findByIdAndDelete(reviewId);
 
@@ -241,6 +245,28 @@ reviewController.deleteReview = async (req, res) => {
 
   }catch(error){
     return res.status(400).json({ status: "fail", error: error.message })
+  }
+}
+
+reviewController.getMainPageReview = async(req,res) => {
+  try{
+    const star = parseInt(req.query.starRate, 10);
+    const qty = parseInt(req.query.reviewQty, 10);
+    const review = await Review.find({starRate:star, isSuspended:false})
+      .populate({
+        path:'userId',
+        select:'name image'
+      })
+      .populate({
+        path:'reservationId',
+        select:'ticket',
+      })
+      .sort({createdAt: -1})
+      .limit(qty);
+    if(!review) throw new Error("5점 리뷰가 없습니다!")
+    res.status(200).json({status:"success", data:review});
+  }catch(error){
+    res.status(400).json({status:"fail", error:error.message})
   }
 }
 

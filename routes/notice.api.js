@@ -29,5 +29,6 @@ router.delete(
 );
 
 router.get('/user-notice', noticeController.getNoticeListVer2);
+router.get('/main', noticeController.getMainPageNoticeList);
 
 module.exports = router;
