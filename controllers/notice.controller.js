@@ -1,3 +1,4 @@
+const { response } = require('express');
 const Notice = require('../models/Notice');
 const noticeController = {};
 
@@ -125,35 +126,36 @@ noticeController.getNoticeListVer2 = async (req, res) => {
   try {
     const PAGE_SIZE = 5;
     const { page, title } = req.query;
+    const pageNum = parseInt(page) || 1;
 
     const cond = {
       ...(title && { title: { $regex: title, $options: 'i' } }),
     };
 
-    // 1. 중요한 공지사항 가져오기
+    // 중요 공지사항 가져오기
     const importantNotices = await Notice.find({ ...cond, isImportant: true })
       .populate({ path: 'userId', model: 'User' })
       .sort({ createdAt: -1 });
 
-    // 2. 일반 공지사항 가져오기 (중요 공지사항은 제외)
-    const normalNoticesQuery = Notice.find({ ...cond, isImportant: false })
+    // 일반 공지사항 가져오기 (중요 공지사항은 제외)
+    const normalNotices = await Notice.find({ ...cond, isImportant: false })
       .populate({ path: 'userId', model: 'User' })
       .sort({ createdAt: -1 });
 
-    if (page) {
-      normalNoticesQuery.skip((page - 1) * PAGE_SIZE).limit(PAGE_SIZE);
-    }
+    // 모든 공지사항을 결합
+    const allNotices = importantNotices.concat(normalNotices);
 
-    const normalNotices = await normalNoticesQuery.exec();
-    const totalItemNum = await Notice.find({
-      ...cond,
-      isImportant: false,
-    }).count();
+    // 페이지네이션 적용
+    const totalItemNum = allNotices.length;
     const totalPageNum = Math.ceil(totalItemNum / PAGE_SIZE);
+    const paginatedNotices = allNotices.slice(
+      (pageNum - 1) * PAGE_SIZE,
+      pageNum * PAGE_SIZE,
+    );
 
     const response = {
       status: 'success',
-      data: importantNotices.concat(normalNotices), // 중요 공지 + 일반 공지
+      data: paginatedNotices,
       totalPageNum,
     };
 
@@ -162,5 +164,15 @@ noticeController.getNoticeListVer2 = async (req, res) => {
     res.status(400).json({ status: 'error', error: error.message });
   }
 };
+
+noticeController.getMainPageNoticeList = async(req,res) => {
+  try{
+    const {size} = req.query;
+    const notice = await Notice.find({isImportant:true}).limit(size);
+    res.status(200).json({status:"success", data:notice})
+  }catch(error){
+    res.status(400).json({status:"fail", error:error.message});
+  }
+}
 
 module.exports = noticeController;

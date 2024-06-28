@@ -9,6 +9,7 @@ const reserveController = require('./reserve.controller');
 const forbiddenWords = ['바보', '멍청이', '새끼'];
 
 // [ 리뷰 작성 ]
+// [ 리뷰 작성 ]
 reviewController.createReview = async (req, res) => {
   try {
     const { userId } = req;
