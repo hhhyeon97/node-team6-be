@@ -14,6 +14,17 @@ router.post(
 );
 
 // 마이페이지 - > 비밀번호 수정
+// router.put(
+//   '/change-password',
+//   authController.authenticate,
+//   passwordController.changePassword,
+// );
+
+router.post(
+  '/verify-password',
+  authController.authenticate,
+  passwordController.verifyCurrentPassword,
+);
 router.put(
   '/change-password',
   authController.authenticate,
