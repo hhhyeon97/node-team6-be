@@ -121,133 +121,40 @@ noticeController.deleteNotice = async (req, res) => {
   }
 };
 
-// noticeController.getNoticeListVer2 = async (req, res) => {
-//   try {
-//     const PAGE_SIZE = 5;
-//     const { page, title } = req.query;
-
-//     const cond = {
-//       ...(title && { title: { $regex: title, $options: 'i' } }),
-//     };
-
-//     // 1. 중요한 공지사항 가져오기
-//     const importantNotices = await Notice.find({ ...cond, isImportant: true })
-//       .populate({ path: 'userId', model: 'User' })
-//       .sort({ createdAt: -1 });
-
-//     // 2. 일반 공지사항 가져오기 (중요 공지사항은 제외)
-//     const normalNoticesQuery = Notice.find({ ...cond, isImportant: false })
-//       .populate({ path: 'userId', model: 'User' })
-//       .sort({ createdAt: -1 });
-
-//     if (page) {
-//       normalNoticesQuery.skip((page - 1) * PAGE_SIZE).limit(PAGE_SIZE);
-//     }
-
-//     const normalNotices = await normalNoticesQuery.exec();
-//     const totalItemNum = await Notice.find({
-//       ...cond,
-//       isImportant: false,
-//     }).count();
-//     const totalPageNum = Math.ceil(totalItemNum / PAGE_SIZE);
-
-//     const response = {
-//       status: 'success',
-//       data: importantNotices.concat(normalNotices), // 중요 공지 + 일반 공지
-//       totalPageNum,
-//     };
-
-//     return res.status(200).json(response);
-//   } catch (error) {
-//     res.status(400).json({ status: 'error', error: error.message });
-//   }
-// };
-
-// noticeController.getNoticeListVer2 = async (req, res) => {
-//   try {
-//     const PAGE_SIZE = 5;
-//     const { page, title } = req.query;
-
-//     const cond = {
-//       ...(title && { title: { $regex: title, $options: 'i' } }),
-//     };
-
-//     // 1. 중요한 공지사항 가져오기
-//     const importantNotices = await Notice.find({ ...cond, isImportant: true })
-//       .populate({ path: 'userId', model: 'User' })
-//       .sort({ createdAt: -1 });
-
-//     // 2. 일반 공지사항 가져오기 (중요 공지사항은 제외)
-//     const normalNoticesQuery = Notice.find({ ...cond, isImportant: false })
-//       .populate({ path: 'userId', model: 'User' })
-//       .sort({ createdAt: -1 });
-
-//     if (page) {
-//       normalNoticesQuery.skip((page - 1) * PAGE_SIZE).limit(PAGE_SIZE);
-//     }
-
-//     const normalNotices = await normalNoticesQuery.exec();
-//     const totalItemNum = await Notice.find({
-//       ...cond,
-//       isImportant: false,
-//     }).count();
-//     const totalPageNum = Math.ceil(totalItemNum / PAGE_SIZE);
-
-//     const response = {
-//       status: 'success',
-//       data: {
-//         importantNotices,
-//         normalNotices,
-//       },
-//       totalPageNum,
-//     };
-
-//     return res.status(200).json(response);
-//   } catch (error) {
-//     res.status(400).json({ status: 'error', error: error.message });
-//   }
-// };
-
 noticeController.getNoticeListVer2 = async (req, res) => {
   try {
     const PAGE_SIZE = 5;
     const { page, title } = req.query;
+    const pageNum = parseInt(page) || 1;
 
     const cond = {
       ...(title && { title: { $regex: title, $options: 'i' } }),
     };
 
-    // 1. 중요한 공지사항 가져오기
+    // 중요 공지사항 가져오기
     const importantNotices = await Notice.find({ ...cond, isImportant: true })
       .populate({ path: 'userId', model: 'User' })
       .sort({ createdAt: -1 });
 
-    // 2. 일반 공지사항 가져오기 (중요 공지사항은 제외)
-    const skipCount = (page - 1) * PAGE_SIZE - importantNotices.length;
-    const normalNoticesQuery = Notice.find({ ...cond, isImportant: false })
+    // 일반 공지사항 가져오기 (중요 공지사항은 제외)
+    const normalNotices = await Notice.find({ ...cond, isImportant: false })
       .populate({ path: 'userId', model: 'User' })
       .sort({ createdAt: -1 });
 
-    if (skipCount > 0) {
-      normalNoticesQuery
-        .skip(skipCount)
-        .limit(PAGE_SIZE - importantNotices.length);
-    } else {
-      normalNoticesQuery.limit(PAGE_SIZE - importantNotices.length);
-    }
+    // 모든 공지사항을 결합
+    const allNotices = importantNotices.concat(normalNotices);
 
-    const normalNotices = await normalNoticesQuery.exec();
-    const totalItemNum = await Notice.find({
-      ...cond,
-      isImportant: false,
-    }).count();
-    const totalPageNum = Math.ceil(
-      (totalItemNum + importantNotices.length) / PAGE_SIZE,
+    // 페이지네이션 적용
+    const totalItemNum = allNotices.length;
+    const totalPageNum = Math.ceil(totalItemNum / PAGE_SIZE);
+    const paginatedNotices = allNotices.slice(
+      (pageNum - 1) * PAGE_SIZE,
+      pageNum * PAGE_SIZE,
     );
 
     const response = {
       status: 'success',
-      data: importantNotices.concat(normalNotices).slice(0, PAGE_SIZE), // 중요 공지 + 일반 공지
+      data: paginatedNotices,
       totalPageNum,
     };
 
