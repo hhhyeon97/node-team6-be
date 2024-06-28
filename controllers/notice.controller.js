@@ -165,6 +165,7 @@ noticeController.getNoticeListVer2 = async (req, res) => {
   }
 };
 
+// 메인푸터 공지사항 가져오기
 noticeController.getMainPageNoticeList = async(req,res) => {
   try{
     const {size} = req.query;
