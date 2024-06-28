@@ -1,4 +1,9 @@
 const User = require('../models/User');
+const Review = require('../models/Review');
+const Reservation = require('../models/Reservation');
+const Like = require('../models/Like');
+const Notice = require('../models/Notice');
+
 const bcrypt = require('bcryptjs');
 
 const userController = {};
@@ -123,6 +128,27 @@ userController.updateUserLevel = async (req, res) => {
     res.status(200).json({ status: "success", data: user });
 
   } catch {
+    res.status(400).json({ status: 'error', error: error.message });
+  }
+}
+
+// [ 회원 탈퇴 ]
+userController.deleteUser = async (req, res) => {
+  try{
+    const userId = req.params.id;
+
+    const user = await User.findByIdAndDelete(userId);
+    if(!user) throw new Error('해당 유저가 존재하지 않습니다');
+    
+    await User.deleteMany({ userId });
+    await Review.deleteMany({ userId });
+    await Reservation.deleteMany({ userId });
+    await Like.deleteMany({ userId });
+    await Notice.deleteMany({ userId });
+
+    res.status(200).json({ status: 'success', message: '회원 탈퇴가 성공적으로 처리되었습니다' });
+    
+  }catch(error){
     res.status(400).json({ status: 'error', error: error.message });
   }
 }

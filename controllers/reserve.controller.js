@@ -137,9 +137,24 @@ reserveController.getReserveByDate = async (req, res) => {
 reserveController.updateReview = async (reserveId) => {
   try {
     const reserve = await Reservation.findById(reserveId);
-    if (reserve.isReview) throw new Error("이미 리뷰가 존재합니다!");
+    if (reserve.ticket.isReview) throw new Error("이미 리뷰가 존재합니다!");
     let newReview = { ...reserve.ticket };
     newReview.isReview = true;
+    reserve.ticket = newReview;
+    await reserve.save();
+
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
+
+reserveController.deleteReview = async (reserveId) => {
+  try {
+    const reserve = await Reservation.findById(reserveId);
+    console.log(reserve)
+    if (!reserve.ticket.isReview) throw new Error("삭제할 리뷰가 없습니다!");
+    let newReview = { ...reserve.ticket };
+    newReview.isReview = false;
     reserve.ticket = newReview;
     await reserve.save();
 
