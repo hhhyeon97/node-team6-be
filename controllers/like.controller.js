@@ -30,8 +30,13 @@ likeController.addLikeToList = async(req,res)=>{
 likeController.getLikeListById = async(req,res)=>{
     try{
         const {userId} = req;
+        // const likeList = await Like.findOne({userId}).sort({createdAt})
+        // const sortLikeList = likeList.items.sort({})
         const likeList = await Like.findOne({userId});
-        res.status(200).json({status:"success",data:likeList.items});
+        const sortList = likeList.items.sort((a, b) => b.createdAt - a.createdAt);
+        console.log("likeList",likeList)
+        console.log("sort",sortList)
+        res.status(200).json({status:"success",data:sortList});
     }catch(error){
         res.status(400).json({status:"fail",error:error.message});
     }
