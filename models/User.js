@@ -9,7 +9,7 @@ const userSchema = Schema(
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     name: { type: String, required: true },
-    level: { type: String, default: 'normal' }, // 4types: normal, gold, suspend, admin
+    level: { type: String, default: 'gold' }, // 4types: normal, gold, suspend, admin
     image: { type: String, default: '' },
     contact: { type: String, default: '' },
     // 비밀번호 재설정 토큰
