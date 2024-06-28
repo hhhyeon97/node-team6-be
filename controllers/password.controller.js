@@ -99,12 +99,11 @@ passwordController.checkResetToken = async (req, res, next) => {
     res.status(500).json({ status: 'error', error: error.message });
   }
 };
-
-// 비밀번호 변경
-passwordController.changePassword = async (req, res) => {
+// 현재 비밀번호 확인
+passwordController.verifyCurrentPassword = async (req, res) => {
   try {
     const { userId } = req;
-    const { currentPassword, newPassword } = req.body;
+    const { currentPassword } = req.body;
 
     const user = await User.findById(userId);
     if (!user) {
@@ -112,7 +111,7 @@ passwordController.changePassword = async (req, res) => {
         .status(400)
         .json({ status: 'error', error: '사용자를 찾을 수 없습니다.' });
     }
-    // 현재 비밀번호가 맞는지 확인
+
     const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) {
       return res
@@ -120,12 +119,32 @@ passwordController.changePassword = async (req, res) => {
         .json({ status: 'error', error: '현재 비밀번호가 올바르지 않습니다.' });
     }
 
+    res.status(200).json({
+      status: 'success',
+      message: '현재 비밀번호가 확인되었습니다.',
+      isAuthenticated: true,
+    });
+  } catch (error) {
+    res.status(500).json({ status: 'error', error: error.message });
+  }
+};
+
+passwordController.changePassword = async (req, res) => {
+  try {
+    const { userId } = req;
+    const { newPassword } = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res
+        .status(400)
+        .json({ status: 'error', error: '사용자를 찾을 수 없습니다.' });
+    }
     // 새로운 비밀번호 설정
     const salt = await bcrypt.genSaltSync(10);
     user.password = await bcrypt.hash(newPassword, salt);
-
+    // console.log('tttttttttt hashedPassword:', user.password);
     await user.save();
-
     res.status(200).json({
       status: 'success',
       message: '비밀번호가 성공적으로 변경되었습니다.',
