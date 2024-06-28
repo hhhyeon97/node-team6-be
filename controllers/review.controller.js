@@ -26,8 +26,8 @@ reviewController.createReview = async (req, res) => {
     if (reviewText.length < 15) throw new Error("최소 15자 이상 작성해주세요")
 
     // 별점 검사
-    if (starRate < 0 || starRate > 5) {
-      throw new Error("별점은 0에서 5 사이의 값이어야 합니다");
+    if (starRate < 1 || starRate > 5) {
+      throw new Error("별점은 1에서 5 사이의 값이어야 합니다");
     }
 
     // 금지어 검사
