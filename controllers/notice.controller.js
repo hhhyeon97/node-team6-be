@@ -1,3 +1,4 @@
+const { response } = require('express');
 const Notice = require('../models/Notice');
 const noticeController = {};
 
@@ -163,5 +164,16 @@ noticeController.getNoticeListVer2 = async (req, res) => {
     res.status(400).json({ status: 'error', error: error.message });
   }
 };
+
+// 메인푸터 공지사항 가져오기
+noticeController.getMainPageNoticeList = async(req,res) => {
+  try{
+    const {size} = req.query;
+    const notice = await Notice.find({isImportant:true}).limit(size);
+    res.status(200).json({status:"success", data:notice})
+  }catch(error){
+    res.status(400).json({status:"fail", error:error.message});
+  }
+}
 
 module.exports = noticeController;

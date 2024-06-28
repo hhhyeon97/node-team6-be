@@ -21,4 +21,7 @@ router.put("/:id",
   authController.checkAdminPermission,
   reviewController.editReviewState);
 
+//mainpage
+router.get("/main",reviewController.getMainPageReview);
+
 module.exports = router;
