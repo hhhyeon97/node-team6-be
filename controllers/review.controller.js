@@ -8,7 +8,7 @@ const reserveController = require('./reserve.controller');
 // 금지어 목록
 const forbiddenWords = ['바보', '멍청이', '새끼'];
 
-// [ 리뷰 생성 ]
+// [ 리뷰 작성 ]
 reviewController.createReview = async (req, res) => {
   try {
     const { userId } = req;
@@ -169,7 +169,6 @@ reviewController.getMyReviewList = async (req, res) => {
     const { userId } = req
 
     const reviewMyList = await Review.find({ userId }).sort({ createdAt: -1 });  // 리뷰 전체 가져오기
-    console.log('reviewMyList', reviewMyList)
 
     const resultData = []
     for (const review of reviewMyList) {
@@ -186,6 +185,61 @@ reviewController.getMyReviewList = async (req, res) => {
     res.status(200).json({ status: "success", data: resultData });
 
   } catch (error) {
+    return res.status(400).json({ status: "fail", error: error.message })
+  }
+}
+
+// [ 나의 리뷰 수정 ]
+reviewController.editReview = async (req, res) => {
+  try{
+    let { reviewText, starRate, image, reviewId } = req.body;
+
+    const review = await Review.findById(reviewId);
+    if (!review)throw new Error("리뷰 내역이 없습니다") 
+
+    // 리뷰 내용 검사
+    if (!reviewText.trim()) throw new Error("리뷰를 작성해주세요")
+    if (reviewText.length < 15) throw new Error("최소 15자 이상 작성해주세요")
+
+    // 별점 검사
+    if (starRate < 0 || starRate > 5) {
+      throw new Error("별점은 0에서 5 사이의 값이어야 합니다");
+    }
+
+    // 금지어 검사
+    for (let word of forbiddenWords) {
+      if (reviewText.includes(word)) { // 금지어 검사에 일정 횟수 걸리면 계정 정지(TO DO)
+        throw new Error("부적절한 리뷰입니다");
+      }
+    }
+
+    // 리뷰 수정
+    review.reviewText = reviewText;
+    review.starRate = starRate;
+    review.image = image;
+
+    await review.save();
+
+    res.status(200).json({ status: "success", data: review })
+
+  }catch(error){
+    return res.status(400).json({ status: "fail", error: error.message })
+  }
+}
+
+// [ 나의 리뷰 삭제 ]
+reviewController.deleteReview = async (req, res) => {
+  try{
+    const reviewId = req.params.id;
+    if (!reviewId) {
+      throw new Error("리뷰가 존재하지 않습니다");
+    }
+
+    const review = await Review.findByIdAndDelete(reviewId);
+
+    res.status(200).json({ status: "success", data: review })
+
+  }catch(error){
     return res.status(400).json({ status: "fail", error: error.message })
   }
 }
