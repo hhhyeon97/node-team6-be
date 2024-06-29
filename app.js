@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const app = express();
-const indexRouter = require("./routes/index");
+const indexRouter = require('./routes/index');
 require('dotenv').config();
 
 const LOCAL_DB_ADDRESS = process.env.LOCAL_DB_ADDRESS;
@@ -13,10 +13,10 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 // /api가 붙은 주소로 오면 indexRouter로 보낸다
-app.use("/api", indexRouter);
+app.use('/api', indexRouter);
 
 mongoose
-  .connect(LOCAL_DB_ADDRESS, { useNewUrlParser: true })
+  .connect(MONGODB_URI_PROD, { useNewUrlParser: true })
   .then(() => console.log('mongoose connected !'))
   .catch((err) => console.log('db connection fail', err));
 
