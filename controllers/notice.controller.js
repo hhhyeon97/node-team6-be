@@ -7,10 +7,12 @@ noticeController.createNotice = async (req, res) => {
   try {
     const { userId } = req;
     const { title, content, img, isImportant } = req.body;
-
+    console.log("title",title.length)
     // 공지사항 내용 검사
     if (!title.trim()) throw new Error('제목을 입력해주세요');
     if (!content.trim()) throw new Error('내용을 입력해주세요');
+    if (title.length < 4) throw new Error('최소 4자 이상 작성해주세요');
+    if (title.length > 25) throw new Error('제목의 길이는 최대 25자 입니다');
     if (content.length < 15) throw new Error('최소 15자 이상 작성해주세요');
 
     const notice = await Notice({
@@ -81,6 +83,8 @@ noticeController.editNotice = async (req, res) => {
     if (!title.trim()) throw new Error('제목을 입력해주세요');
     if (!content.trim()) throw new Error('내용을 입력해주세요');
     if (content.length < 15) throw new Error('최소 15자 이상 작성해주세요');
+    if (title.length < 4) throw new Error('최소 4자 이상 작성해주세요');
+    if (title.length > 25) throw new Error('제목의 길이는 최대 25자 입니다');
 
     // 공지사항 수정
     existingNotice.title = title;
