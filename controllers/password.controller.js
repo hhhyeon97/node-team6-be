@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const nodemailer = require('nodemailer');
 require('dotenv').config();
-const FRONTEND_URL = 'http://localhost:3000';
+const FRONTEND_URL = 'https://noona-culture.netlify.app';
 const passwordController = {};
 
 // 비밀번호 재발급 요청
