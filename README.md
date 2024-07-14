@@ -25,7 +25,7 @@ Noona Culture는 공연정보를 조회 및 예매할 수 있는 종합적인 �
 
 - 배포페이지 바로가기: [Noona Culture](https://noona-culture.netlify.app/)
 - User Story 바로가기: [User Story](https://docs.google.com/spreadsheets/d/1HGgDP4rUhWvZL-eKAirGMlfbq1DQ98yUOebkyV5f2GQ/edit?gid=0#gid=0)
-- front repository 바로가기: [node-team6-fe](https://github.com/hhhyeon97/node-team6-fe)
+- front-end repository 바로가기: [node-team6-fe](https://github.com/hhhyeon97/node-team6-fe)
 - 발표 ppt 바로가기: (준비중)
 - 프로젝트 노션 바로가기: (준비중)
 - 프로젝트 ERD: [ERD](https://app.diagrams.net/#G1Z4yWPmKpvHqm78CCv1bmOwMLuUIFFN_Q#%7B%22pageId%22%3A%22eOnixxZUXJWLaz6sClB1%22%7D)
