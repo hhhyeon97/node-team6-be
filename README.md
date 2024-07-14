@@ -23,6 +23,7 @@
 Noona Culture는 공연정보를 조회 및 예매할 수 있는 종합적인 서비스입니다.  
 
 - 배포페이지 바로가기: [Noona Culture](https://noona-culture.netlify.app/)
+- User Story 바로가기: [User Story](https://docs.google.com/spreadsheets/d/1HGgDP4rUhWvZL-eKAirGMlfbq1DQ98yUOebkyV5f2GQ/edit?gid=0#gid=0)
 - front repository 바로가기: [node-team6-fe](https://github.com/hhhyeon97/node-team6-fe)
 - 발표 ppt 바로가기: (준비중)
 - 프로젝트 노션 바로가기: (준비중)
@@ -43,7 +44,19 @@ Noona Culture는 공연정보를 조회 및 예매할 수 있는 종합적인 �
 | 정예진 | Developer | 공연리스트 페이지, 공연디테일 페이지, 예매&결제 페이지 | |
 | 송이수 | Developer | 메인 페이지, 검색 페이지, 찜 페이지, 헤더&푸터 | |
 
-## 기술 스택
+## 기술 스택  
+<img src="https://img.shields.io/badge/javascript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black"> <img src="https://img.shields.io/badge/react-61DAFB?style=for-the-badge&logo=react&logoColor=black">
+<img src="https://img.shields.io/badge/node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white">
+<img src="https://img.shields.io/badge/mongodb-47A248?style=for-the-badge&logo=mongodb&logoColor=white">
+<img src="https://img.shields.io/badge/express-000000?style=for-the-badge&logo=express&logoColor=white">
+<img src="https://img.shields.io/badge/fontawesome-528DD7?style=for-the-badge&logo=fontawesome&logoColor=white">
+<img src="https://img.shields.io/badge/netlify-00C7B7?style=for-the-badge&logo=netlify&logoColor=white">
+<img src="https://img.shields.io/badge/bootstrap-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white">
+<img src="https://img.shields.io/badge/sass-CC6699?style=for-the-badge&logo=sass&logoColor=white">
+- API: [공연예술통합전산망](https://www.kopis.or.kr/por/cs/openapi/openApiInfo.do?menuId=MNU_00074)
+- SERVER: Cloude Type
+- 아이디어 및 회의 툴 : Figma(Figjam), Discode, Notion, Spread Sheet
+
 
 ## 구현 기능 및 화면
 
