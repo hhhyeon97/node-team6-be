@@ -45,7 +45,7 @@ Noona Culture는 공연정보를 조회 및 예매할 수 있는 종합적인 �
 |---|---|---|---|
 | 최주연 | Project Owner | 마이페이지, 관리자페이지, 웹디자인 | [jebi2420](https://github.com/jebi2420?tab=overview&from=2024-01-01&to=2024-01-04) |
 | 김민솔 | Scrum Master | 회원가입 페이지, 로그인 페이지, 비밀번호 재설정, 공지사항 페이지  | [hhhyeon97](https://github.com/hhhyeon97) |
-| 정예진 | Developer | 공연리스트 페이지, 공연디테일 페이지, 예매&결제 페이지 | |
+| 정예진 | Developer | 공연리스트 페이지, 공연디테일 페이지, 예매&결제 페이지 |[newuserYejin](https://github.com/newuserYejin) |
 | 송이수 | Developer | 메인 페이지, 검색 페이지, 찜 페이지, 헤더&푸터 | |
 
 ## ⚙️ 기술 스택  
