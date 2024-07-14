@@ -19,7 +19,20 @@
 - [회고](#-회고)
 
 
-## 프로젝트 소개
+## 프로젝트 소개  
+Noona Culture는 공연정보를 조회 및 예매할 수 있는 종합적인 서비스입니다.  
+
+- 배포페이지 바로가기: [Noona Culture](https://noona-culture.netlify.app/)
+- front repository 바로가기: [node-team6-fe](https://github.com/hhhyeon97/node-team6-fe)
+- 발표 ppt 바로가기: (준비중)
+- 프로젝트 노션 바로가기: (준비중)
+  
+### 📅 개발기간 및 진행방식
+
+<img width="702" alt="스크린샷 2024-07-14 오후 3 49 25" src="https://github.com/user-attachments/assets/e346fff5-7b4a-4d8f-913c-c43e2560d6c9">
+
+- 개발기간: 2024-06-16 ~ 2024-06-30
+- 진행방식: AGILE, SCRUM
 
 ## 팀 소개  
 코딩알려주는누나 Node.js 스터디 1기 6조
