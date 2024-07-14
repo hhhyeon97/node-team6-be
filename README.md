@@ -1,4 +1,14 @@
-# 🖼️ Noona Culture
+# 🖼️ Noona Culture  
+![version](https://img.shields.io/badge/version-1.0.0-blue)  
+
+![NoonaCulture_logo](https://github.com/user-attachments/assets/9a14c607-6ea2-40f6-bad6-bfbb84087c0f)  
+
+<details>
+<summary>업데이트 정보 보기</summary>
+
+- v1.0.0 (2024-06-30): 첫 번째 릴리스
+
+</details>
 
 ## 목차
 
