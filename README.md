@@ -109,8 +109,8 @@ Noona Culture는 공연정보를 조회 및 예매할 수 있는 종합적인 �
    - 시도 방법:
       - **xml2js**: npm 에서의 xml2js을 설치하여 해결하려하였으나 buffer 추가 설치, loading 등의 여러가지 설치 이슈의 이유로 방법 변경하기로 결정.
       - **domparser**: xml데이터를 parseFromString 를 이용하여 dom트리구조로 변환. xmlToJson를 작성하여 nodeType에 대한 처리를 작성하고 JSON 객체에서 불필요한 텍스트 노드를 정리하기 위해 cleanUp 작성 하여 활용
-  - **mongoDB 날짜 저장**
-      - 문제점: mongoDB에 날짜 타입을 저장하게 되면 9시간이 더해져서 저장된다.
+- **mongoDB 날짜 저장**
+   - 문제점: mongoDB에 날짜 타입을 저장하게 되면 9시간이 더해져서 저장된다.
 
 
 ## 🖋 회고
