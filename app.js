@@ -15,15 +15,6 @@ app.use(bodyParser.json());
 // /api가 붙은 주소로 오면 indexRouter로 보낸다
 app.use('/api', indexRouter);
 
-// mongoose
-//   .connect(MONGODB_URI_PROD, { useNewUrlParser: true })
-//   .then(() => console.log('mongoose connected !'))
-//   .catch((err) => console.log('db connection fail', err));
-
-// app.listen(process.env.PORT || 5000, () => {
-//   console.log('server on');
-// });
-
 const connectDB = async () => {
   try {
     await mongoose.connect(MONGODB_URI_PROD);
@@ -37,12 +28,3 @@ const connectDB = async () => {
   }
 };
 connectDB();
-
-// mongoose
-//   .connect(MONGODB_URI_PROD)
-//   .then(() => console.log('Connected to MongoDB'))
-//   .catch((err) => console.error('Could not connect to MongoDB', err));
-
-// app.listen(process.env.PORT || 5000, () => {
-//   console.log('server on');
-// });
