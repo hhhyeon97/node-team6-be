@@ -117,15 +117,14 @@ authController.kakaoCallback = async (req, res) => {
     }
 
     const localToken = await user.generateToken();
-    res.status(200).json({ status: 'success', user, token: localToken });
+    // res.status(200).json({ status: 'success', user, token: localToken });
+    // ?로그인 성공 시 프론트엔드로 리디렉션
+    res.redirect(
+      `https://noona-culture.netlify.app/kakao/callback?token=${localToken}`,
+    );
   } catch (error) {
     res.status(400).json({ status: 'fail', error: error.message });
     console.log('에러', error.message);
-    // console.error('Error during Kakao callback:', error);
-    // res.status(500).json({
-    //   error: '카카오 로그인에 실패하였습니다.',
-    //   details: error.message,
-    // });
   }
 };
 
@@ -178,11 +177,6 @@ authController.naverCallback = async (req, res) => {
     const localToken = await user.generateToken();
     res.status(200).json({ status: 'success', user, token: localToken });
   } catch (error) {
-    // console.error('Error during Naver callback:', error);
-    // res.status(500).json({
-    //   error: '네이버 로그인에 실패하였습니다.',
-    //   details: error.message,
-    // });
     res.status(400).json({ status: 'fail', error: error.message });
     console.log('에러', error.message);
   }
