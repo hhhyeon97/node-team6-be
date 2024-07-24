@@ -6,5 +6,6 @@ router.post('/login', authController.loginWithEmail);
 router.post('/google', authController.loginWithGoogle);
 router.get('/kakao/callback', authController.kakaoCallback);
 router.get('/naver/callback', authController.naverCallback);
+// router.post('/kakao', authController.kakaoLogin);
 
 module.exports = router;
