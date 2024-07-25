@@ -136,10 +136,133 @@ authController.loginWithGoogle = async (req, res) => {
 // const KAKAO_REDIRECT_URI = process.env.KAKAO_REDIRECT_URI;
 // const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 
-authController.kakaoLogin = async (req, res) => {
-  const { code } = req.body;
+// authController.kakaoLogin = async (req, res) => {
+//   const { code } = req.body;
 
+//   try {
+//     const tokenResponse = await axios.post(
+//       'https://kauth.kakao.com/oauth/token',
+//       null,
+//       {
+//         params: {
+//           grant_type: 'authorization_code',
+//           client_id: KAKAO_REST_API_KEY,
+//           redirect_uri: KAKAO_REDIRECT_URI,
+//           code,
+//         },
+//       },
+//     );
+
+//     const { access_token } = tokenResponse.data;
+
+//     const kakaoResponse = await axios.get('https://kapi.kakao.com/v2/user/me', {
+//       headers: {
+//         Authorization: `Bearer ${access_token}`,
+//       },
+//     });
+
+//     const kakaoProfile = kakaoResponse.data;
+//     const { kakao_account, properties } = kakaoProfile;
+//     const email = kakao_account.email;
+//     const name = properties.nickname;
+
+//     let user = await User.findOne({ email });
+//     if (!user) {
+//       const randomPassword = '' + Math.floor(Math.random() * 1000000);
+//       const salt = await bcrypt.genSalt(10);
+//       const newPassword = await bcrypt.hash(randomPassword, salt);
+
+//       user = new User({
+//         name,
+//         email,
+//         password: newPassword,
+//       });
+//       await user.save();
+//     }
+//     const localToken = await user.generateToken();
+//     console.log('be ttttttttttt11111111111111');
+//     res.status(200).json({ status: 'success', user, token: localToken });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
+
+// // test 2
+
+// authController.kakaoCallback = async (req, res) => {
+//   const { code } = req.query;
+//   try {
+//     console.log('Received authorization code:', code);
+
+//     const tokenResponse = await axios.post(
+//       'https://kauth.kakao.com/oauth/token',
+//       null,
+//       {
+//         params: {
+//           grant_type: 'authorization_code',
+//           client_id: KAKAO_REST_API_KEY,
+//           redirect_uri: KAKAO_REDIRECT_URI,
+//           // redirect_uri:
+//           //   'https://noona-culture.netlify.app/api/auth/kakao/callback',
+//           code,
+//         },
+//       },
+//     );
+
+//     console.log('Token response:', tokenResponse.data);
+
+//     const { access_token } = tokenResponse.data;
+
+//     const kakaoResponse = await axios.get('https://kapi.kakao.com/v2/user/me', {
+//       headers: {
+//         Authorization: `Bearer ${access_token}`,
+//       },
+//     });
+
+//     console.log('User info response:', kakaoResponse.data);
+
+//     const kakaoProfile = kakaoResponse.data;
+//     const { kakao_account, properties } = kakaoProfile;
+//     const email = kakao_account.email;
+//     const name = properties.nickname;
+
+//     let user = await User.findOne({ email });
+//     if (!user) {
+//       const randomPassword = '' + Math.floor(Math.random() * 1000000);
+//       const salt = await bcrypt.genSalt(10);
+//       const newPassword = await bcrypt.hash(randomPassword, salt);
+
+//       user = new User({
+//         name,
+//         email,
+//         password: newPassword,
+//       });
+//       await user.save();
+//     }
+//     const localToken = await user.generateToken();
+//     console.log('토킄ㅋㅋㅋㅋㅋㅋㅋ', localToken);
+//     // res.status(200).json({ status: 'success', user, token: localToken });
+//     // JSON 응답 대신 리디렉션
+//     // const redirectUrl = `https://noona-culture.netlify.app/kakao/callback?token=${localToken}`;
+//     const redirectUrl = `http://localhost:3000/api/auth/kakao/callback?token=${localToken}`;
+//     res.redirect(redirectUrl);
+//   } catch (error) {
+//     console.error('Error during Kakao callback:', error);
+//     res.status(500).json({
+//       error: '카카오 로그인에 실패하였습니다.',
+//       details: error.message,
+//     });
+//   }
+// };
+
+// test
+
+authController.kakaoCallback = async (req, res) => {
+  const { code } = req.query;
   try {
+    console.log('Received authorization code:', code);
+
+    // Step 1: Get access token from Kakao
     const tokenResponse = await axios.post(
       'https://kauth.kakao.com/oauth/token',
       null,
@@ -152,67 +275,10 @@ authController.kakaoLogin = async (req, res) => {
         },
       },
     );
-
+    // console.log('Token response:', tokenResponse.data);
     const { access_token } = tokenResponse.data;
 
-    const kakaoResponse = await axios.get('https://kapi.kakao.com/v2/user/me', {
-      headers: {
-        Authorization: `Bearer ${access_token}`,
-      },
-    });
-
-    const kakaoProfile = kakaoResponse.data;
-    const { kakao_account, properties } = kakaoProfile;
-    const email = kakao_account.email;
-    const name = properties.nickname;
-
-    let user = await User.findOne({ email });
-    if (!user) {
-      const randomPassword = '' + Math.floor(Math.random() * 1000000);
-      const salt = await bcrypt.genSalt(10);
-      const newPassword = await bcrypt.hash(randomPassword, salt);
-
-      user = new User({
-        name,
-        email,
-        password: newPassword,
-      });
-      await user.save();
-    }
-    const localToken = await user.generateToken();
-    console.log('be ttttttttttt11111111111111');
-    res.status(200).json({ status: 'success', user, token: localToken });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-// test 2
-
-authController.kakaoCallback = async (req, res) => {
-  const { code } = req.query;
-  try {
-    console.log('Received authorization code:', code);
-
-    const tokenResponse = await axios.post(
-      'https://kauth.kakao.com/oauth/token',
-      null,
-      {
-        params: {
-          grant_type: 'authorization_code',
-          client_id: KAKAO_REST_API_KEY,
-          // redirect_uri: KAKAO_REDIRECT_URI,
-          redirect_uri:
-            'https://noona-culture.netlify.app/api/auth/kakao/callback',
-          code,
-        },
-      },
-    );
-
-    console.log('Token response:', tokenResponse.data);
-
-    const { access_token } = tokenResponse.data;
-
+    // Step 2: Get user info from Kakao
     const kakaoResponse = await axios.get('https://kapi.kakao.com/v2/user/me', {
       headers: {
         Authorization: `Bearer ${access_token}`,
@@ -226,6 +292,7 @@ authController.kakaoCallback = async (req, res) => {
     const email = kakao_account.email;
     const name = properties.nickname;
 
+    // Step 3: Find or create user
     let user = await User.findOne({ email });
     if (!user) {
       const randomPassword = '' + Math.floor(Math.random() * 1000000);
@@ -239,7 +306,12 @@ authController.kakaoCallback = async (req, res) => {
       });
       await user.save();
     }
+
     const localToken = await user.generateToken();
+
+    // // Step 4: Redirect to frontend with token
+    // const redirectUrl = `http://localhost:3000/token-callback?token=${localToken}`;
+    // res.redirect(redirectUrl);
     res.status(200).json({ status: 'success', user, token: localToken });
   } catch (error) {
     console.error('Error during Kakao callback:', error);
