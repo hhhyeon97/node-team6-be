@@ -257,42 +257,89 @@ authController.loginWithGoogle = async (req, res) => {
 
 // test
 
-authController.kakaoCallback = async (req, res) => {
-  const { code } = req.query;
+// authController.kakaoCallback = async (req, res) => {
+//   const { code } = req.query;
+//   try {
+//     console.log('Received authorization code:', code);
+
+//     // Step 1: Get access token from Kakao
+//     const tokenResponse = await axios.post(
+//       'https://kauth.kakao.com/oauth/token',
+//       null,
+//       {
+//         params: {
+//           grant_type: 'authorization_code',
+//           client_id: KAKAO_REST_API_KEY,
+//           redirect_uri: KAKAO_REDIRECT_URI,
+//           code,
+//         },
+//       },
+//     );
+//     // console.log('Token response:', tokenResponse.data);
+//     const { access_token } = tokenResponse.data;
+
+//     // Step 2: Get user info from Kakao
+//     const kakaoResponse = await axios.get('https://kapi.kakao.com/v2/user/me', {
+//       headers: {
+//         Authorization: `Bearer ${access_token}`,
+//       },
+//     });
+
+//     console.log('User info response:', kakaoResponse.data);
+
+//     const kakaoProfile = kakaoResponse.data;
+//     const { kakao_account, properties } = kakaoProfile;
+//     const email = kakao_account.email;
+//     const name = properties.nickname;
+
+//     // Step 3: Find or create user
+//     let user = await User.findOne({ email });
+//     if (!user) {
+//       const randomPassword = '' + Math.floor(Math.random() * 1000000);
+//       const salt = await bcrypt.genSalt(10);
+//       const newPassword = await bcrypt.hash(randomPassword, salt);
+
+//       user = new User({
+//         name,
+//         email,
+//         password: newPassword,
+//       });
+//       await user.save();
+//     }
+
+//     const localToken = await user.generateToken();
+
+//     // // Step 4: Redirect to frontend with token
+//     // const redirectUrl = `http://localhost:3000/token-callback?token=${localToken}`;
+//     // res.redirect(redirectUrl);
+//     res.status(200).json({ status: 'success', user, token: localToken });
+//   } catch (error) {
+//     console.error('Error during Kakao callback:', error);
+//     res.status(500).json({
+//       error: '카카오 로그인에 실패하였습니다.',
+//       details: error.message,
+//     });
+//   }
+// };
+
+// test !!!!!!!!
+
+authController.loginWithKakao = async (req, res) => {
+  const { token } = req.body;
+  // console.log('토큰 확인', token);
   try {
-    console.log('Received authorization code:', code);
-
-    // Step 1: Get access token from Kakao
-    const tokenResponse = await axios.post(
-      'https://kauth.kakao.com/oauth/token',
-      null,
-      {
-        params: {
-          grant_type: 'authorization_code',
-          client_id: KAKAO_REST_API_KEY,
-          redirect_uri: KAKAO_REDIRECT_URI,
-          code,
-        },
-      },
-    );
-    // console.log('Token response:', tokenResponse.data);
-    const { access_token } = tokenResponse.data;
-
-    // Step 2: Get user info from Kakao
     const kakaoResponse = await axios.get('https://kapi.kakao.com/v2/user/me', {
       headers: {
-        Authorization: `Bearer ${access_token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
 
-    console.log('User info response:', kakaoResponse.data);
-
     const kakaoProfile = kakaoResponse.data;
+    console.log('프로필 확인', kakaoProfile);
     const { kakao_account, properties } = kakaoProfile;
     const email = kakao_account.email;
     const name = properties.nickname;
 
-    // Step 3: Find or create user
     let user = await User.findOne({ email });
     if (!user) {
       const randomPassword = '' + Math.floor(Math.random() * 1000000);
@@ -308,17 +355,10 @@ authController.kakaoCallback = async (req, res) => {
     }
 
     const localToken = await user.generateToken();
-
-    // // Step 4: Redirect to frontend with token
-    // const redirectUrl = `http://localhost:3000/token-callback?token=${localToken}`;
-    // res.redirect(redirectUrl);
     res.status(200).json({ status: 'success', user, token: localToken });
   } catch (error) {
-    console.error('Error during Kakao callback:', error);
-    res.status(500).json({
-      error: '카카오 로그인에 실패하였습니다.',
-      details: error.message,
-    });
+    console.error(error);
+    res.status(500).json({ error: '카카오 로그인에 실패하였습니다.' });
   }
 };
 
