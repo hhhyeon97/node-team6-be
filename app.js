@@ -18,9 +18,9 @@ app.use(bodyParser.json());
 // /api가 붙은 주소로 오면 indexRouter로 보낸다
 app.use('/api', indexRouter);
 
-// app.use(session({ secret: 'secret', resave: false, saveUninitialized: true }));
-// app.use(passport.initialize());
-// app.use(passport.session());
+app.use(session({ secret: 'secret', resave: false, saveUninitialized: true }));
+app.use(passport.initialize());
+app.use(passport.session());
 
 const connectDB = async () => {
   try {
