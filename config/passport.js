@@ -9,7 +9,6 @@ passport.use(
     {
       clientID: process.env.NAVER_CLIENT_ID,
       clientSecret: process.env.NAVER_CLIENT_SECRET,
-      // callbackURL: 'http://localhost:5000/api/auth/naver/callback',
       callbackURL: 'https://noona-culture.netlify.app/api/auth/naver/callback',
       passReqToCallback: true,
     },
